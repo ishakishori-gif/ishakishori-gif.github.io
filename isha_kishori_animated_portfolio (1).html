@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Isha Kishori — Creative Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --gold:#c9a96e;
+  --gold-dim:#8a6f3e;
+  --bg:#080808;
+  --bg2:#0f0f0f;
+  --bg3:#141414;
+  --border:#1c1c1c;
+  --text:#f0ede6;
+  --muted:#777;
+  --dim:#3a3a3a;
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Mono',monospace;
+  font-size:13px;
+  line-height:1.7;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CUSTOM CURSOR */
+.cursor{
+  position:fixed;
+  width:8px;height:8px;
+  background:var(--gold);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9999;
+  transition:transform 0.15s ease;
+  mix-blend-mode:difference;
+}
+.cursor-ring{
+  position:fixed;
+  width:32px;height:32px;
+  border:0.5px solid var(--gold);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9998;
+  transition:all 0.12s ease;
+  opacity:0.5;
+}
+
+/* CANVAS BG */
+#bgCanvas{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;
+  opacity:0.35;
+}
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:1;
+  opacity:0.6;
+}
+
+/* ALL CONTENT ABOVE CANVAS */
+nav,main,footer{position:relative;z-index:2;}
+
+/* NAV */
+nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  background:rgba(8,8,8,0.88);
+  backdrop-filter:blur(12px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:1.1rem 3rem;
+  border-bottom:0.5px solid var(--border);
+  transform:translateY(-100%);
+  animation:slideDown 0.8s cubic-bezier(.16,1,.3,1) 0.3s forwards;
+}
+
+@keyframes slideDown{to{transform:translateY(0);}}
+
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:0.05em;
+}
+
+.nav-links{display:flex;gap:2.5rem;}
+.nav-links a{
+  font-size:9px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+  text-decoration:none;
+  transition:color 0.25s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';
+  position:absolute;
+  bottom:-2px;left:0;right:0;
+  height:0.5px;
+  background:var(--gold);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.3s ease;
+}
+.nav-links a:hover{color:var(--gold);}
+.nav-links a:hover::after{transform:scaleX(1);}
+
+/* SCROLL REVEAL */
+.reveal{
+  opacity:0;
+  transform:translateY(40px);
+  transition:opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
+}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity 0.9s cubic-bezier(.16,1,.3,1),transform 0.9s cubic-bezier(.16,1,.3,1);}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(40px);transition:opacity 0.9s cubic-bezier(.16,1,.3,1),transform 0.9s cubic-bezier(.16,1,.3,1);}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+
+/* Stagger delays */
+.d1{transition-delay:0.05s;}.d2{transition-delay:0.12s;}.d3{transition-delay:0.19s;}
+.d4{transition-delay:0.26s;}.d5{transition-delay:0.33s;}.d6{transition-delay:0.40s;}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border-bottom:0.5px solid var(--border);
+  padding-top:70px;
+}
+
+.hero-left{
+  padding:6rem 3rem;
+  border-right:0.5px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.hero-tag{
+  font-size:9px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:2rem;
+  opacity:0;
+  animation:fadeUp 0.7s ease 0.9s forwards;
+}
+
+.hero-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,6vw,5.5rem);
+  font-weight:700;
+  line-height:0.92;
+  letter-spacing:-0.02em;
+  color:#f5f0e8;
+  margin-bottom:2rem;
+  overflow:hidden;
+}
+
+.hero-name .line{
+  display:block;
+  opacity:0;
+  transform:translateY(100%);
+  animation:lineUp 0.8s cubic-bezier(.16,1,.3,1) forwards;
+}
+.hero-name .line:nth-child(1){animation-delay:1s;}
+.hero-name .line:nth-child(2){animation-delay:1.15s;}
+.hero-name .line:nth-child(3){animation-delay:1.3s;}
+
+.hero-name em{font-style:italic;color:var(--gold);}
+
+.hero-bio{
+  font-size:11px;
+  color:var(--muted);
+  max-width:380px;
+  line-height:1.9;
+  font-weight:300;
+  margin-bottom:2.5rem;
+  opacity:0;
+  animation:fadeUp 0.7s ease 1.5s forwards;
+}
+
+.hero-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  font-size:9px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--gold);
+  text-decoration:none;
+  border:0.5px solid var(--gold-dim);
+  padding:0.85rem 2rem;
+  transition:all 0.35s ease;
+  opacity:0;
+  animation:fadeUp 0.7s ease 1.7s forwards;
+  width:fit-content;
+  position:relative;
+  overflow:hidden;
+}
+.hero-cta::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:var(--gold);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.35s ease;
+  z-index:-1;
+}
+.hero-cta:hover{color:#080808;}
+.hero-cta:hover::before{transform:scaleX(1);}
+
+.hero-right{
+  padding:6rem 3rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+}
+
+.hero-stats{
+  display:flex;
+  gap:3rem;
+  margin-bottom:3rem;
+  opacity:0;
+  animation:fadeUp 0.7s ease 1.4s forwards;
+}
+
+.stat-num{
+  font-family:'Playfair Display',serif;
+  font-size:2.8rem;
+  font-weight:700;
+  color:var(--gold);
+  line-height:1;
+  counter-reset:none;
+}
+
+.stat-label{
+  font-size:9px;
+  color:var(--dim);
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  margin-top:5px;
+}
+
+.hero-info{
+  border-top:0.5px solid var(--border);
+  padding-top:2rem;
+  display:flex;
+  flex-direction:column;
+  gap:0.6rem;
+  opacity:0;
+  animation:fadeUp 0.7s ease 1.6s forwards;
+}
+
+.info-row{
+  display:flex;
+  gap:1rem;
+  font-size:10px;
+}
+.info-key{
+  color:var(--dim);
+  min-width:70px;
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.info-val{color:var(--muted);}
+.info-val.open{color:#5a9a5a;}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes lineUp{
+  from{opacity:0;transform:translateY(100%);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* GOLD LINE */
+.gold-line{
+  height:0.5px;
+  background:linear-gradient(90deg,transparent,var(--gold) 30%,transparent);
+  position:relative;
+  z-index:2;
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 1s ease;
+}
+.gold-line.visible{transform:scaleX(1);}
+
+/* SECTION */
+.section{border-bottom:0.5px solid var(--border);}
+
+.sec-label{
+  padding:2rem 3rem 1rem;
+  font-size:9px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--dim);
+  border-bottom:0.5px solid var(--border);
+}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;}
+
+.about-col{
+  padding:3.5rem 3rem;
+  border-right:0.5px solid var(--border);
+}
+.about-col:last-child{border-right:none;}
+
+.about-h{
+  font-family:'Playfair Display',serif;
+  font-size:1.6rem;
+  font-weight:400;
+  color:#f5f0e8;
+  line-height:1.3;
+  margin-bottom:1.5rem;
+}
+.about-h em{font-style:italic;color:var(--gold);}
+
+.about-p{font-size:11px;color:var(--muted);line-height:1.9;font-weight:300;}
+
+.soft-list{list-style:none;display:flex;flex-direction:column;gap:0.8rem;margin-top:1.5rem;}
+.soft-list li{
+  font-size:11px;
+  color:var(--muted);
+  display:flex;
+  gap:1rem;
+  align-items:flex-start;
+  padding:0.6rem 0;
+  border-bottom:0.5px solid var(--border);
+  transition:color 0.25s;
+}
+.soft-list li:hover{color:#e8e3da;}
+.soft-list li::before{content:'——';color:var(--gold-dim);flex-shrink:0;margin-top:1px;}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);}
+
+.skill-item{
+  padding:2rem 3rem;
+  border-right:0.5px solid var(--border);
+  border-bottom:0.5px solid var(--border);
+}
+.skill-item:nth-child(3n){border-right:none;}
+
+.skill-name{font-size:11px;color:#e8e3da;margin-bottom:0.8rem;}
+
+.skill-track{height:1px;background:#1a1a1a;position:relative;overflow:hidden;}
+.skill-fill{
+  height:1px;
+  background:linear-gradient(90deg,var(--gold-dim),var(--gold));
+  position:absolute;top:0;left:0;
+  width:0;
+  transition:width 1.4s cubic-bezier(.16,1,.3,1);
+}
+.skill-fill.animate{width:var(--w);}
+
+.skill-pct{font-size:9px;color:var(--dim);margin-top:5px;text-align:right;}
+
+/* EDUCATION */
+.edu-grid{display:grid;grid-template-columns:1fr 1fr;}
+
+.edu-item{
+  padding:2.5rem 3rem;
+  border-right:0.5px solid var(--border);
+  border-bottom:0.5px solid var(--border);
+  position:relative;
+  overflow:hidden;
+  transition:background 0.3s;
+}
+.edu-item:nth-child(2n){border-right:none;}
+.edu-item:hover{background:var(--bg2);}
+
+.edu-item::before{
+  content:'';
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:2px;
+  background:var(--gold);
+  transform:scaleY(0);
+  transform-origin:top;
+  transition:transform 0.4s ease;
+}
+.edu-item:hover::before{transform:scaleY(1);}
+
+.edu-year{
+  font-size:9px;
+  color:var(--gold);
+  letter-spacing:0.15em;
+  margin-bottom:0.5rem;
+}
+.edu-inst{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;
+  font-weight:400;
+  color:#e8e3da;
+  line-height:1.3;
+  margin-bottom:0.4rem;
+}
+.edu-deg{font-size:10px;color:var(--muted);}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;}
+
+.proj-item{
+  padding:2.5rem 3rem;
+  border-right:0.5px solid var(--border);
+  border-bottom:0.5px solid var(--border);
+  position:relative;
+  overflow:hidden;
+  cursor:default;
+  transition:background 0.35s;
+}
+.proj-item:nth-child(2n){border-right:none;}
+.proj-item:hover{background:var(--bg2);}
+
+.proj-num{
+  font-size:9px;color:var(--dim);
+  letter-spacing:0.1em;margin-bottom:1rem;
+  transition:color 0.3s;
+}
+.proj-item:hover .proj-num{color:var(--gold);}
+
+.proj-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.25rem;font-weight:400;
+  color:#e8e3da;margin-bottom:0.5rem;
+}
+
+.proj-badge{
+  display:inline-block;
+  font-size:8px;letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--gold);
+  border:0.5px solid var(--gold-dim);
+  padding:2px 8px;margin-bottom:0.8rem;
+}
+
+.proj-desc{font-size:10px;color:var(--muted);line-height:1.8;font-weight:300;}
+
+.proj-bar{
+  position:absolute;bottom:0;left:0;
+  height:1px;background:var(--gold);
+  width:0;transition:width 0.5s ease;
+}
+.proj-item:hover .proj-bar{width:100%;}
+
+/* ACHIEVEMENTS */
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);}
+
+.ach-item{
+  padding:2.5rem 3rem;
+  border-right:0.5px solid var(--border);
+  transition:background 0.3s;
+  position:relative;
+  overflow:hidden;
+}
+.ach-item:last-child{border-right:none;}
+.ach-item:hover{background:var(--bg2);}
+
+.ach-icon{
+  font-size:1.6rem;
+  margin-bottom:1rem;
+  display:block;
+  filter:grayscale(0.3);
+  transition:transform 0.3s ease,filter 0.3s;
+}
+.ach-item:hover .ach-icon{transform:scale(1.15);filter:none;}
+
+.ach-title{font-size:11px;color:#e8e3da;line-height:1.4;margin-bottom:0.4rem;}
+.ach-org{font-size:9px;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase;}
+
+/* CONTACT */
+.contact-wrap{display:grid;grid-template-columns:1fr 1fr;}
+
+.contact-left{
+  padding:4.5rem 3rem;
+  border-right:0.5px solid var(--border);
+}
+.contact-h{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,3.5vw,2.8rem);
+  font-weight:400;
+  font-style:italic;
+  color:#f5f0e8;
+  line-height:1.2;
+  margin-bottom:1.5rem;
+}
+.contact-sub{font-size:10px;color:var(--muted);line-height:1.9;font-weight:300;max-width:340px;}
+
+.contact-right{
+  padding:4.5rem 3rem;
+  display:flex;flex-direction:column;justify-content:center;gap:0;
+}
+
+.contact-row{
+  display:flex;align-items:center;gap:1rem;
+  padding:1rem 0;
+  border-bottom:0.5px solid var(--border);
+  transition:background 0.25s;
+  position:relative;
+}
+.contact-row:first-child{border-top:0.5px solid var(--border);}
+
+.contact-row::after{
+  content:'';
+  position:absolute;left:0;bottom:0;
+  height:0.5px;
+  background:var(--gold);
+  width:0;
+  transition:width 0.4s ease;
+}
+.contact-row:hover::after{width:100%;}
+
+.c-key{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--dim);min-width:70px;}
+.c-val{font-size:11px;color:var(--muted);}
+
+/* FOOTER */
+footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:1.25rem 3rem;
+  border-top:0.5px solid var(--border);
+  background:var(--bg);
+}
+.f-copy{font-size:9px;color:var(--dim);letter-spacing:0.1em;}
+
+.avail{
+  display:flex;align-items:center;gap:8px;
+  font-size:9px;color:#5a8a5a;
+  letter-spacing:0.12em;text-transform:uppercase;
+}
+.avail-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:#4a9a4a;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  body{cursor:auto;}
+  .cursor,.cursor-ring{display:none;}
+  nav{padding:1rem 1.5rem;}
+  .nav-links{gap:1.5rem;}
+  .hero{grid-template-columns:1fr;}
+  .hero-left,.hero-right{padding:3rem 1.5rem;border-right:none;}
+  .hero-right{border-top:0.5px solid var(--border);}
+  .about-grid,.edu-grid,.proj-grid,.contact-wrap{grid-template-columns:1fr;}
+  .about-col,.edu-item,.proj-item{border-right:none;padding:2rem 1.5rem;}
+  .skills-grid{grid-template-columns:1fr 1fr;}
+  .skill-item{padding:1.5rem;}
+  .ach-grid{grid-template-columns:1fr;}
+  .ach-item{border-right:none;border-bottom:0.5px solid var(--border);}
+  .contact-left,.contact-right{padding:2.5rem 1.5rem;border-right:none;}
+  .sec-label{padding:1.5rem;}
+  footer{flex-direction:column;gap:0.5rem;text-align:center;padding:1rem 1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">IK.</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#education">Education</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-left">
+    <p class="hero-tag">MCA Student</p>
+    <h1 class="hero-name">
+      <span class="line">Isha</span>
+      <span class="line"><em>Kishori.</em></span>
+    </h1>
+    <p class="hero-bio">
+      Computer Applications student with a passion for UI/UX design, typography,
+      and creative problem-solving. Pursuing MCA at BIT Mesra while building
+      real-world skills in web development and visual design.
+    </p>
+    <a href="#contact" class="hero-cta">
+      Get in touch <span style="font-size:14px;margin-top:-1px">→</span>
+    </a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">2+</div>
+        <div class="stat-label">Projects</div>
+      </div>
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Certifications</div>
+      </div>
+      <div>
+        <div class="stat-num">MCA</div>
+        <div class="stat-label">Pursuing</div>
+      </div>
+    </div>
+    <div class="hero-info">
+      <div class="info-row"><span class="info-key">Email</span><span class="info-val">ishakishori@gmail.com</span></div>
+      <div class="info-row"><span class="info-key">Phone</span><span class="info-val">+91 8757756301</span></div>
+      <div class="info-row"><span class="info-key">Location</span><span class="info-val">Ranchi, Jharkhand</span></div>
+      <div class="info-row"><span class="info-key">Status</span><span class="info-val open">Open to internships</span></div>
+      <div class="info-row"><span class="info-key">Languages</span><span class="info-val">English, Hindi</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-line reveal"></div>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <p class="sec-label">About</p>
+  <div class="about-grid">
+    <div class="about-col reveal-left d1">
+      <h2 class="about-h">Design with<br><em>intention.</em><br>Build with clarity.</h2>
+      <p class="about-p">
+        I'm a fresher actively seeking internship and entry-level opportunities
+        where I can apply my design and development skills in a professional environment.
+        I believe great interfaces tell a story — through space, type, and thoughtful interaction.
+      </p>
+    </div>
+    <div class="about-col reveal-right d2">
+      <p style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim);margin-bottom:0.5rem;">Soft Skills</p>
+      <ul class="soft-list">
+        <li>Communication — clear, confident &amp; collaborative</li>
+        <li>Creativity — original thinker with an eye for aesthetics</li>
+        <li>Teamwork — proven contributor in events &amp; projects</li>
+        <li>Problem Solving — analytical approach to design challenges</li>
+        <li>Quick Learner — adapts fast to new tools &amp; environments</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="section" id="skills">
+  <p class="sec-label">Skills &amp; Tools</p>
+  <div class="skills-grid">
+    <div class="skill-item reveal d1">
+      <p class="skill-name">HTML / CSS</p>
+      <div class="skill-track"><div class="skill-fill" style="--w:80%"></div></div>
+      <p class="skill-pct">80%</p>
+    </div>
+    <div class="skill-item reveal d2">
+      <p class="skill-name">UI/UX Design</p>
+      <div class="skill-track"><div class="skill-fill" style="--w:75%"></div></div>
+      <p class="skill-pct">75%</p>
+    </div>
+    <div class="skill-item reveal d3">
+      <p class="skill-name">Canva Design</p>
+      <div class="skill-track"><div class="skill-fill" style="--w:85%"></div></div>
+      <p class="skill-pct">85%</p>
+    </div>
+    <div class="skill-item reveal d4">
+      <p class="skill-name">Typography</p>
+      <div class="skill-track"><div class="skill-fill" style="--w:70%"></div></div>
+      <p class="skill-pct">70%</p>
+    </div>
+    <div class="skill-item reveal d5">
+      <p class="skill-name">Image Editing</p>
+      <div class="skill-track"><div class="skill-fill" style="--w:72%"></div></div>
+      <p class="skill-pct">72%</p>
+    </div>
+    <div class="skill-item reveal d6">
+      <p class="skill-name">JavaScript (Learning)</p>
+      <div class="skill-track"><div class="skill-fill" style="--w:40%"></div></div>
+      <p class="skill-pct">40%</p>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section class="section" id="education">
+  <p class="sec-label">Education</p>
+  <div class="edu-grid">
+    <div class="edu-item reveal d1">
+      <p class="edu-year">2025 — 2027</p>
+      <h3 class="edu-inst">Birla Institute of Technology Mesra</h3>
+      <p class="edu-deg">Master of Computer Applications (MCA) · Ranchi, Jharkhand</p>
+    </div>
+    <div class="edu-item reveal d2">
+      <p class="edu-year">2022 — 2025</p>
+      <h3 class="edu-inst">Amity University Jharkhand</h3>
+      <p class="edu-deg">Bachelor of Computer Applications (BCA)</p>
+    </div>
+    <div class="edu-item reveal d3">
+      <p class="edu-year">2020 — 2022</p>
+      <h3 class="edu-inst">Ursuline Inter College, Ranchi</h3>
+      <p class="edu-deg">12th Board</p>
+    </div>
+    <div class="edu-item reveal d4">
+      <p class="edu-year">2019 — 2020</p>
+      <h3 class="edu-inst">D.A.V Kapil Dev Public School, Ranchi</h3>
+      <p class="edu-deg">10th Board</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section" id="projects">
+  <p class="sec-label">Projects</p>
+  <div class="proj-grid">
+    <div class="proj-item reveal-left d1">
+      <p class="proj-num">01 ——</p>
+      <h3 class="proj-title">Portfolio Website</h3>
+      <span class="proj-badge">Ongoing</span>
+      <p class="proj-desc">
+        Developing a personal portfolio website using HTML, CSS, and basic JavaScript.
+        Working on responsive design and user interface improvement to showcase
+        creative and technical abilities.
+      </p>
+      <div class="proj-bar"></div>
+    </div>
+    <div class="proj-item reveal-right d2">
+      <p class="proj-num">02 ——</p>
+      <h3 class="proj-title">Web Development Projects</h3>
+      <span class="proj-badge">In Process</span>
+      <p class="proj-desc">
+        Creating foundational websites as part of the web development learning journey.
+        Using HTML, CSS, and JavaScript for structure, styling, and interactivity —
+        building a solid base for future full-stack work.
+      </p>
+      <div class="proj-bar"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section class="section">
+  <p class="sec-label">Achievements &amp; Certifications</p>
+  <div class="ach-grid">
+    <div class="ach-item reveal d1">
+      <span class="ach-icon">🏆</span>
+      <p class="ach-title">2nd Position — Rangoli Competition</p>
+      <p class="ach-org">Amity University Jharkhand</p>
+    </div>
+    <div class="ach-item reveal d2">
+      <span class="ach-icon">🎖</span>
+      <p class="ach-title">Certificate of Appreciation — Decoration Team</p>
+      <p class="ach-org">Amity University Jharkhand</p>
+    </div>
+    <div class="ach-item reveal d3">
+      <span class="ach-icon">🔐</span>
+      <p class="ach-title">Cybersecurity &amp; Ethical Hacking Workshop</p>
+      <p class="ach-org">BIT Mesra</p>
+    </div>
+  </div>
+</section>
+
+<div class="gold-line reveal"></div>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="contact-wrap">
+    <div class="contact-left reveal-left">
+      <h2 class="contact-h">Let's build something together.</h2>
+      <p class="contact-sub">
+        I'm actively looking for internship and entry-level design or development roles.
+        If you think we'd work well together, I'd love to hear from you.
+      </p>
+    </div>
+    <div class="contact-right reveal-right">
+      <div class="contact-row"><span class="c-key">Email</span><span class="c-val">ishakishori@gmail.com</span></div>
+      <div class="contact-row"><span class="c-key">Phone</span><span class="c-val">+91 8757756301</span></div>
+      <div class="contact-row"><span class="c-key">Location</span><span class="c-val">Ranchi, Jharkhand 834001</span></div>
+      <div class="contact-row"><span class="c-key">Languages</span><span class="c-val">English, Hindi</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="f-copy">© 2025 Isha Kishori. Designed with intention.</p>
+  <div class="avail"><div class="avail-dot"></div>Available for internships</div>
+</footer>
+
+<script>
+// CUSTOM CURSOR
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=(mx-4)+'px'; cur.style.top=(my-4)+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=(rx-16)+'px'; ring.style.top=(ry-16)+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a,button,.proj-item,.edu-item,.ach-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cur.style.transform='scale(2.5)';
+    ring.style.transform='scale(1.5)';
+    ring.style.opacity='0.2';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cur.style.transform='scale(1)';
+    ring.style.transform='scale(1)';
+    ring.style.opacity='0.5';
+  });
+});
+
+// PARTICLE CANVAS
+const canvas=document.getElementById('bgCanvas');
+const ctx=canvas.getContext('2d');
+let W,H,particles=[];
+
+function resize(){
+  W=canvas.width=window.innerWidth;
+  H=canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+
+function Particle(){
+  this.x=Math.random()*W;
+  this.y=Math.random()*H;
+  this.r=Math.random()*1.2+0.3;
+  this.vx=(Math.random()-0.5)*0.3;
+  this.vy=(Math.random()-0.5)*0.3;
+  this.alpha=Math.random()*0.5+0.1;
+}
+
+for(let i=0;i<90;i++) particles.push(new Particle());
+
+function drawParticles(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(201,169,110,${p.alpha})`;
+    ctx.fill();
+  });
+  // Connect nearby particles
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(201,169,110,${0.06*(1-dist/100)})`;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// SCROLL REVEAL OBSERVER
+const revealObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      // Animate skill bars
+      e.target.querySelectorAll('.skill-fill').forEach(f=>f.classList.add('animate'));
+    }
+  });
+},{threshold:0.12});
+
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.gold-line').forEach(el=>{
+  revealObs.observe(el);
+});
+
+// Also trigger skill bars on section enter
+const skillObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.skill-fill').forEach(f=>f.classList.add('animate'));
+    }
+  });
+},{threshold:0.1});
+const skillSec=document.querySelector('#skills');
+if(skillSec) skillObs.observe(skillSec);
+
+// NAV ACTIVE STATE
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{
+    if(window.scrollY>=s.offsetTop-120) cur=s.id;
+  });
+  navLinks.forEach(a=>{
+    a.style.color=a.getAttribute('href')==='#'+cur?'#c9a96e':'';
+  });
+});
+</script>
+</body>
+</html>
